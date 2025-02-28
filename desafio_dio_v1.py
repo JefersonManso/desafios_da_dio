@@ -1,7 +1,7 @@
 
-"""CABEÇALHO DO PROGRAMA""" 
+CABEÇALHO DO PROGRAMA 
 
-'''print("================================") 
+print("================================") 
 print("    SISTEMA BANCÁRIO v1.0     "  )
 print("================================")
 # FIM DO CABEÇALHO
@@ -72,4 +72,4 @@ while True:
     
     # Caso o usuário escolha uma opção inválida
     else:
-        print("Opção inválida. Tente novamente.")'''
+        print("Opção inválida. Tente novamente.")
