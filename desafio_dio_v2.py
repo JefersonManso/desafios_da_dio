@@ -1,86 +1,143 @@
-from datetime import datetime  # Importa o módulo para trabalhar com data e hora
+# Importações
+import textwrap
+from abc import ABC, abstractclassmethod, abstractproperty
+from datetime import datetime
 
-#CABEÇALHO DO PROGRAMA## 
+class ContasIterador:
+    def __init__(self, contas):
+        self.contas = contas
+        self._index = 0
 
-print("================================") 
-print("    SISTEMA BANCÁRIO v2.0     "  )
-print("================================")
-# FIM DO CABEÇALHO
+    def __iter__(self):
+        return self
 
-# Inicializa as variáveis do sistema
-saldo = 0.0  # Saldo da conta bancária
-transacoes = []  # Lista para armazenar as transações (depósitos e saques)
-limite_transacoes = 10  # Limite diário de transações
+    def __next__(self):
+        try:
+            conta = self.contas[self._index]
+            return f"""\            
+            Agência:\t{conta.agencia}
+            Número:\t\t{conta.numero}
+            Titular:\t{conta.cliente.nome}
+            Saldo:\t\tR$ {conta.saldo:.2f}
+        """
+        except IndexError:
+            raise StopIteration
+        finally:
+            self._index += 1
 
-# Função para exibir o menu
-def exibir_menu():
-    print("\n************* MENU *************")
-    print("1 - Depósito")
-    print("2 - Saque")
-    print("3 - Extrato")
-    print("4 - Sair")
-    print("\n********************************")
+class ContasIterador:
+    def __init__(self, contas):
+        self.contas = contas
+        self._index = 0
 
-# Função para realizar um depósito
-def depositar():
-    global saldo, transacoes  # Acessa as variáveis globais
-    
-    if len(transacoes) >= limite_transacoes:
-        print("Você atingiu o limite de transações diárias.")
-        return
-    
-    valor = float(input("Digite o valor do depósito: R$ "))  # Solicita o valor do depósito
-    if valor > 0:
-        saldo += valor  # Atualiza o saldo
-        data_hora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")  # Obtém a data e hora atual
-        transacoes.append(("Depósito", valor, data_hora))  # Registra a transação
-        print(f"Depósito de R$ {valor:.2f} realizado com sucesso!")
-    else:
-        print("Valor inválido! O depósito deve ser maior que zero.")
+    def __iter__(self):
+        return self
 
-# Função para realizar um saque
-def sacar():
-    global saldo, transacoes  # Acessa as variáveis globais
-    
-    if len(transacoes) >= limite_transacoes:
-        print("Você atingiu o limite de transações diárias.")
-        return
-    
-    valor = float(input("Digite o valor do saque: R$ "))  # Solicita o valor do saque
-    if valor > saldo:
-        print("Saldo insuficiente! Não é possível realizar o saque.")  # Verifica se há saldo suficiente
+    def __next__(self):
+        if self._index >= len(self.contas):
+            raise StopIteration
+        conta = self.contas[self._index]
+        self._index += 1
+        return f"""
+        Agência:\t{conta.agencia}
+        Número:\t\t{conta.numero}
+        Titular:\t{conta.cliente.nome}
+        Saldo:\t\tR$ {conta.saldo:.2f}
+        """
+class Cliente:
+    def __init__(self, endereco):
+        self.endereco = endereco
+        self.contas = []
+        self.indice_conta = 0
+
+class Conta:
+    def __init__(self, numero, cliente):
+        self._saldo = 0
+        self._numero = numero
+        self._agencia = "0001"
+        self._cliente = cliente
+        self._historico = Historico()
+def sacar(self, valor):
+    saldo = self.saldo
+    excedeu_saldo = valor > saldo
+
+    if excedeu_saldo:
+        print("\n@@@ Operação falhou! Você não tem saldo suficiente. @@@")
+
     elif valor > 0:
-        saldo -= valor  # Atualiza o saldo
-        data_hora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")  # Obtém a data e hora atual
-        transacoes.append(("Saque", -valor, data_hora))  # Registra a transação
-        print(f"Saque de R$ {valor:.2f} realizado com sucesso!")
-    else:
-        print("Valor inválido! O saque deve ser maior que zero.")
+        self._saldo -= valor
+        print("\n=== Saque realizado com sucesso! ===")
+        return True
 
-# Função para exibir o extrato
-def exibir_extrato():
-    print("\n********************************")
-    if not transacoes:
-        print("Não foram realizadas movimentações.")  # Mensagem caso não haja transações
     else:
-        for tipo, valor, data_hora in transacoes:
-            print(f"{data_hora} - {tipo}: R$ {valor:.2f}")  # Exibe cada transação
-    print(f"Saldo atual: R$ {saldo:.2f}")  # Exibe o saldo atual
+        print("\n@@@ Operação falhou! O valor informado é inválido. @@@")
 
-# Loop principal do sistema
-while True:
-    exibir_menu()
-    opcao = input("Escolha uma opção: ")  # Solicita a opção do usuário
-    
-    if opcao == "1":
-        depositar()
-    elif opcao == "2":
-        sacar()
-    elif opcao == "3":
-        exibir_extrato()
-    elif opcao == "4":
-        print("Saindo do sistema. Obrigado por usar nosso banco!")
-        break  # Encerra o loop
-    else:
-        print("Opção inválida! Tente novamente.")
-        
+    return False
+def sacar(self, valor):
+    if valor <= 0:
+        print("\n@@@ Operação falhou! O valor informado é inválido. @@@")
+        return False
+
+    if valor > self.saldo:
+        print("\n@@@ Operação falhou! Você não tem saldo suficiente. @@@")
+        return False
+
+    self._saldo -= valor
+    print("\n=== Saque realizado com sucesso! ===")
+    return True
+class ContaCorrente(Conta):
+    def __init__(self, numero, cliente, limite=500, limite_saques=3):
+        super().__init__(numero, cliente)
+        self._limite = limite
+        self._limite_saques = limite_saques
+def adicionar_transacao(self, transacao):
+    self._transacoes.append(
+        {
+            "tipo": transacao.__class__.__name__,
+            "valor": transacao.valor,
+            "data": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+        }
+    )
+class Transacao(ABC):
+    @property
+    @abstractproperty
+    def valor(self):
+        pass
+
+    @abstractclassmethod
+    def registrar(self, conta):
+        pass
+class Transacao(ABC):
+    @property
+    @abstractmethod
+    def valor(self):
+        pass
+
+    @abstractmethod
+    def registrar(self, conta):
+        pass
+def recuperar_conta_cliente(cliente):
+    if not cliente.contas:
+        print("\n@@@ Cliente não possui conta! @@@")
+        return
+
+    # FIXME: não permite cliente escolher a conta
+    return cliente.contas[0]
+def recuperar_conta_cliente(cliente):
+    if not cliente.contas:
+        print("\n@@@ Cliente não possui conta! @@@")
+        return None
+
+    if len(cliente.contas) == 1:
+        return cliente.contas[0]
+
+    print("\nSelecione a conta:")
+    for i, conta in enumerate(cliente.contas, 1):
+        print(f"{i} - Conta {conta.numero} (Saldo: R$ {conta.saldo:.2f})")
+
+    while True:
+        try:
+            escolha = int(input("Digite o número da conta desejada: ")) - 1
+            return cliente.contas[escolha] if 0 <= escolha < len(cliente.contas) else None
+        except (ValueError, IndexError):
+            print("\n@@@ Escolha inválida. Tente novamente. @@@")
