@@ -1,143 +1,149 @@
-# Importações
-import textwrap
-from abc import ABC, abstractclassmethod, abstractproperty
+# # Importações
 from datetime import datetime
+from abc import ABC, abstractmethod
 
-class ContasIterador:
-    def __init__(self, contas):
-        self.contas = contas
-        self._index = 0
+# CABEÇALHO DO PROGRAMA 
 
-    def __iter__(self):
-        return self
+print("================================") 
+print("    SISTEMA BANCÁRIO v2.0     "  )
+print("================================")
+# FIM DO CABEÇALHO
 
-    def __next__(self):
-        try:
-            conta = self.contas[self._index]
-            return f"""\            
-            Agência:\t{conta.agencia}
-            Número:\t\t{conta.numero}
-            Titular:\t{conta.cliente.nome}
-            Saldo:\t\tR$ {conta.saldo:.2f}
-        """
-        except IndexError:
-            raise StopIteration
-        finally:
-            self._index += 1
-
-class ContasIterador:
-    def __init__(self, contas):
-        self.contas = contas
-        self._index = 0
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if self._index >= len(self.contas):
-            raise StopIteration
-        conta = self.contas[self._index]
-        self._index += 1
-        return f"""
-        Agência:\t{conta.agencia}
-        Número:\t\t{conta.numero}
-        Titular:\t{conta.cliente.nome}
-        Saldo:\t\tR$ {conta.saldo:.2f}
-        """
 class Cliente:
-    def __init__(self, endereco):
+    """Classe que representa um cliente do banco."""
+    def __init__(self, nome, cpf, endereco):
+        self.nome = nome
+        self.cpf = cpf
         self.endereco = endereco
         self.contas = []
-        self.indice_conta = 0
+    
+    def adicionar_conta(self, conta): # Adiciona uma conta ao cliente.         
+        self.contas.append(conta)
 
-class Conta:
+class Conta: # Classe base para contas bancárias.
     def __init__(self, numero, cliente):
-        self._saldo = 0
-        self._numero = numero
-        self._agencia = "0001"
-        self._cliente = cliente
-        self._historico = Historico()
-def sacar(self, valor):
-    saldo = self.saldo
-    excedeu_saldo = valor > saldo
-
-    if excedeu_saldo:
-        print("\n@@@ Operação falhou! Você não tem saldo suficiente. @@@")
-
-    elif valor > 0:
-        self._saldo -= valor
+        self.numero = numero
+        self.agencia = "0001"
+        self.cliente = cliente
+        self.saldo = 0
+        self.historico = Historico()
+    
+    def depositar(self, valor): # Realiza um depósito na conta.
+        if valor > 0:
+            self.saldo += valor
+            self.historico.adicionar_transacao("Depósito", valor)
+            print("\n=== Depósito realizado com sucesso! ===")
+        else:
+            print("\n Operação falhou! Valor inválido.")
+    
+    def sacar(self, valor): # Realiza um saque na conta.
+        if valor <= 0:
+            print("\nOperação falhou! O valor informado é inválido.")
+            return False
+        
+        if valor > self.saldo:
+            print("\nOperação falhou! Saldo insuficiente.")
+            return False
+        
+        self.saldo -= valor
+        self.historico.adicionar_transacao("Saque", valor)
         print("\n=== Saque realizado com sucesso! ===")
         return True
+    
+    def exibir_extrato(self): # Exibe o extrato da conta.
+        print("\n=== Extrato ===")
+        for transacao in self.historico.transacoes:
+            print(f"{transacao['data_hora']}: {transacao['tipo']} - R$ {transacao['valor']:.2f}")
+        print(f"\nSaldo: R$ {self.saldo:.2f}")
 
-    else:
-        print("\n@@@ Operação falhou! O valor informado é inválido. @@@")
+class Historico:
+    # Classe que representa o histórico de transações de uma conta.
+    def __init__(self):
+        self.transacoes = []
+    
+    def adicionar_transacao(self, tipo, valor):
+        #Adiciona uma transação ao histórico.
+        if len(self.transacoes) < 10:  # Limite de 10 transações
+            self.transacoes.append({
+                "tipo": tipo,
+                "valor": valor,
+                "data_hora": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+            })
+        else:
+            print("\nHistórico de transações cheio!")
 
-    return False
-def sacar(self, valor):
-    if valor <= 0:
-        print("\n@@@ Operação falhou! O valor informado é inválido. @@@")
-        return False
+# Funções auxiliares
+def criar_cliente(contas):
+    # Cria um novo cliente e adiciona à lista de contas.
+    nome = input("Digite o nome do cliente: ")
+    cpf = input("Digite o CPF do cliente: ")
+    endereco = input("Digite o endereço do cliente: ")
+    cliente = Cliente(nome, cpf, endereco)
+    conta = Conta(numero=len(contas) + 1, cliente=cliente)
+    cliente.adicionar_conta(conta)
+    contas.append(conta)
+    print("\n=== Cliente e conta criados com sucesso! ===")
 
-    if valor > self.saldo:
-        print("\n@@@ Operação falhou! Você não tem saldo suficiente. @@@")
-        return False
-
-    self._saldo -= valor
-    print("\n=== Saque realizado com sucesso! ===")
-    return True
-class ContaCorrente(Conta):
-    def __init__(self, numero, cliente, limite=500, limite_saques=3):
-        super().__init__(numero, cliente)
-        self._limite = limite
-        self._limite_saques = limite_saques
-def adicionar_transacao(self, transacao):
-    self._transacoes.append(
-        {
-            "tipo": transacao.__class__.__name__,
-            "valor": transacao.valor,
-            "data": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
-        }
-    )
-class Transacao(ABC):
-    @property
-    @abstractproperty
-    def valor(self):
-        pass
-
-    @abstractclassmethod
-    def registrar(self, conta):
-        pass
-class Transacao(ABC):
-    @property
-    @abstractmethod
-    def valor(self):
-        pass
-
-    @abstractmethod
-    def registrar(self, conta):
-        pass
-def recuperar_conta_cliente(cliente):
-    if not cliente.contas:
-        print("\n@@@ Cliente não possui conta! @@@")
+def listar_contas(contas):
+    #Lista todas as contas e seus respectivos clientes.
+    if not contas:
+        print("\nNão há contas cadastradas.")
         return
+    
+    print("\n=== Lista de Contas ===")
+    for conta in contas:
+        print(f"Conta: {conta.numero} | Cliente: {conta.cliente.nome} | CPF: {conta.cliente.cpf}")
 
-    # FIXME: não permite cliente escolher a conta
-    return cliente.contas[0]
-def recuperar_conta_cliente(cliente):
-    if not cliente.contas:
-        print("\n@@@ Cliente não possui conta! @@@")
-        return None
-
-    if len(cliente.contas) == 1:
-        return cliente.contas[0]
-
-    print("\nSelecione a conta:")
-    for i, conta in enumerate(cliente.contas, 1):
-        print(f"{i} - Conta {conta.numero} (Saldo: R$ {conta.saldo:.2f})")
-
-    while True:
-        try:
-            escolha = int(input("Digite o número da conta desejada: ")) - 1
-            return cliente.contas[escolha] if 0 <= escolha < len(cliente.contas) else None
-        except (ValueError, IndexError):
-            print("\n@@@ Escolha inválida. Tente novamente. @@@")
+def main():
+    contas = []
+    
+    while True: # Loop do menu
+        print("\n=== Menu ===")
+        print("1. Nova conta")
+        print("2. Listar contas")
+        print("3. Depositar")
+        print("4. Sacar")
+        print("5. Extrato")
+        print("6. Sair")
+        
+        opcao = input("Digite a opção desejada: ") # Solicita ao usuário a opção desejada
+        # Lógica para tratar cada uma das opções.
+        if opcao == "1":
+            criar_cliente(contas) # Cria um novo cliente e conta
+        elif opcao == "2":
+            listar_contas(contas) # Lista todas as contas.
+        elif opcao == "3":
+            numero_conta = int(input("Digite o número da conta: ")) # Solicita o número da conta para depósito.
+            for conta in contas: # Procura a conta pelo número.
+                if conta.numero == numero_conta:
+                    valor = float(input("Digite o valor do depósito: R$ ")) # Solicita o valor do depósito.
+                    conta.depositar(valor) # Realiza o depósito na conta.
+                    break
+            else:
+                print("\nConta não encontrada.")  # Caso a conta não seja encontrada.
+        elif opcao == "4":
+            numero_conta = int(input("Digite o número da conta: "))
+            for conta in contas: # Procura a conta pelo número.
+                if conta.numero == numero_conta:
+                    valor = float(input("Digite o valor do saque:R$ ")) # Solicita o valor do saque.
+                    conta.sacar(valor) # Realiza o saque na conta.
+                    break
+            else:
+                print("\nConta não encontrada.") # Caso a conta não seja encontrada.
+        elif opcao == "5":
+            numero_conta = int(input("Digite o número da conta: ")) # Solicita o número da conta para exibir o extrato.
+            for conta in contas: # Procura a conta pelo número.
+                if conta.numero == numero_conta:
+                    conta.exibir_extrato() # Exibe o extrato da conta.
+                    break
+            else:
+                print("\nConta não encontrada.")  # Caso a conta não seja encontrada.
+        elif opcao == "6":
+            print("\n=== Saindo do sistema... ===") # Finaliza o sistema.
+            break
+        else:
+            print("\nOpção inválida.") # Caso a opção digitada não seja válida.
+            
+# Verifica se o script está sendo executado diretamente e, se sim, chama a função main
+if __name__ == "__main__":
+    main()
